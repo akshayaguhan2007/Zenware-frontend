@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 export default defineConfig({
+  root: path.resolve(__dirname),
   plugins: [
     TanStackRouterVite({
       routesDirectory: "./Routes",
@@ -17,5 +18,8 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "."),
     },
+  },
+  build: {
+    outDir: "dist",
   },
 });
