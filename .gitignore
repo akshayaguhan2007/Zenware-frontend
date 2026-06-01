@@ -1,1 +1,7 @@
-﻿node_modules/\ndist/\n.vite/\n.env\nbun.lock\n.DS_Store\n
+﻿node_modules/
+dist/
+.vite/
+.env
+bun.lock
+.DS_Store
+
