@@ -3,8 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Loader2, Package, ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/integrations/supabase/client";
-import { STATUS_LABEL, type Order } from "@/lib/orders";
+import { loadOrders, STATUS_LABEL, type Order } from "@/lib/orders";
 
 export const Route = createFileRoute("/orders")({
   head: () => ({ meta: [{ title: "My Orders — FASHION" }] }),
@@ -24,14 +23,7 @@ function OrdersPage() {
   const { user, loading } = useAuth();
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["my-orders", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*, order_items(*)")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as Order[];
-    },
+    queryFn: async () => loadOrders().filter((o) => o.user_id === user?.id),
     enabled: !!user,
   });
 

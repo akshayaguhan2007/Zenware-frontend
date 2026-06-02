@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="bg-wine-dark text-cream">
       <div className="mx-auto max-w-7xl px-6 lg:px-10 py-16 grid md:grid-cols-4 gap-10">
         <div className="md:col-span-2">
-          <p className="text-display text-3xl">FASHION</p>
+          <p className="text-display text-3xl">ZenWear</p>
           <p className="mt-4 text-cream/60 text-sm max-w-xs">
             Live for influential and innovative fashion. Curated pieces for the modern wardrobe.
           </p>
@@ -29,8 +29,14 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-cream/10 px-6 lg:px-10 py-6 text-center text-xs text-cream/40">
-        © {new Date().getFullYear()} FASHION. All rights reserved.
+      <div className="border-t border-cream/10 px-6 lg:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-cream/40">
+        <span>© {new Date().getFullYear()} ZenWear. All rights reserved.</span>
+        <div className="flex items-center gap-5">
+          <Link to="/contact" className="hover:text-cream transition-colors">Contact</Link>
+          <Link to="/faq" className="hover:text-cream transition-colors">FAQ</Link>
+          <Link to="/privacy" className="hover:text-cream transition-colors">Privacy Policy</Link>
+          <Link to="/terms" className="hover:text-cream transition-colors">Terms & Conditions</Link>
+        </div>
       </div>
     </footer>
   );

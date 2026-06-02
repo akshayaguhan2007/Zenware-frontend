@@ -29,10 +29,10 @@ function SignupPage() {
     if (password.length < 6) return setError("Password must be at least 6 characters.");
     setLoading(true);
     setError(null);
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(email, password, name);
     setLoading(false);
     if (error) return setError(error);
-    navigate({ to: "/" });
+    navigate({ to: "/profile" });
   }
 
   return (

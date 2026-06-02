@@ -9,15 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './Routes/__root'
+import { Route as TermsRouteImport } from './Routes/terms'
 import { Route as SignupRouteImport } from './Routes/signup'
 import { Route as ResetPasswordRouteImport } from './Routes/reset-password'
 import { Route as ProfileRouteImport } from './Routes/profile'
+import { Route as PrivacyRouteImport } from './Routes/privacy'
 import { Route as OrdersRouteImport } from './Routes/orders'
 import { Route as LoginRouteImport } from './Routes/login'
 import { Route as LifestyleRouteImport } from './Routes/lifestyle'
 import { Route as ForgotPasswordRouteImport } from './Routes/forgot-password'
 import { Route as FavouriteRouteImport } from './Routes/favourite'
 import { Route as FashionRouteImport } from './Routes/fashion'
+import { Route as FaqRouteImport } from './Routes/faq'
+import { Route as ContactRouteImport } from './Routes/contact'
 import { Route as CheckoutRouteImport } from './Routes/checkout'
 import { Route as CatalogueRouteImport } from './Routes/catalogue'
 import { Route as CartRouteImport } from './Routes/cart'
@@ -27,6 +31,11 @@ import { Route as IndexRouteImport } from './Routes/index'
 import { Route as ProductIdRouteImport } from './Routes/product.$id'
 import { Route as OrderIdRouteImport } from './Routes/order.$id'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -40,6 +49,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrdersRoute = OrdersRouteImport.update({
@@ -70,6 +84,16 @@ const FavouriteRoute = FavouriteRouteImport.update({
 const FashionRoute = FashionRouteImport.update({
   id: '/fashion',
   path: '/fashion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -120,15 +144,19 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/catalogue': typeof CatalogueRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/fashion': typeof FashionRoute
   '/favourite': typeof FavouriteRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/lifestyle': typeof LifestyleRoute
   '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/order/$id': typeof OrderIdRoute
   '/product/$id': typeof ProductIdRoute
 }
@@ -139,15 +167,19 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/catalogue': typeof CatalogueRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/fashion': typeof FashionRoute
   '/favourite': typeof FavouriteRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/lifestyle': typeof LifestyleRoute
   '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/order/$id': typeof OrderIdRoute
   '/product/$id': typeof ProductIdRoute
 }
@@ -159,15 +191,19 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/catalogue': typeof CatalogueRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/fashion': typeof FashionRoute
   '/favourite': typeof FavouriteRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/lifestyle': typeof LifestyleRoute
   '/login': typeof LoginRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/order/$id': typeof OrderIdRoute
   '/product/$id': typeof ProductIdRoute
 }
@@ -180,15 +216,19 @@ export interface FileRouteTypes {
     | '/cart'
     | '/catalogue'
     | '/checkout'
+    | '/contact'
+    | '/faq'
     | '/fashion'
     | '/favourite'
     | '/forgot-password'
     | '/lifestyle'
     | '/login'
     | '/orders'
+    | '/privacy'
     | '/profile'
     | '/reset-password'
     | '/signup'
+    | '/terms'
     | '/order/$id'
     | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -199,15 +239,19 @@ export interface FileRouteTypes {
     | '/cart'
     | '/catalogue'
     | '/checkout'
+    | '/contact'
+    | '/faq'
     | '/fashion'
     | '/favourite'
     | '/forgot-password'
     | '/lifestyle'
     | '/login'
     | '/orders'
+    | '/privacy'
     | '/profile'
     | '/reset-password'
     | '/signup'
+    | '/terms'
     | '/order/$id'
     | '/product/$id'
   id:
@@ -218,15 +262,19 @@ export interface FileRouteTypes {
     | '/cart'
     | '/catalogue'
     | '/checkout'
+    | '/contact'
+    | '/faq'
     | '/fashion'
     | '/favourite'
     | '/forgot-password'
     | '/lifestyle'
     | '/login'
     | '/orders'
+    | '/privacy'
     | '/profile'
     | '/reset-password'
     | '/signup'
+    | '/terms'
     | '/order/$id'
     | '/product/$id'
   fileRoutesById: FileRoutesById
@@ -238,21 +286,32 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CatalogueRoute: typeof CatalogueRoute
   CheckoutRoute: typeof CheckoutRoute
+  ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
   FashionRoute: typeof FashionRoute
   FavouriteRoute: typeof FavouriteRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LifestyleRoute: typeof LifestyleRoute
   LoginRoute: typeof LoginRoute
   OrdersRoute: typeof OrdersRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  TermsRoute: typeof TermsRoute
   OrderIdRoute: typeof OrderIdRoute
   ProductIdRoute: typeof ProductIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -272,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orders': {
@@ -314,6 +380,20 @@ declare module '@tanstack/react-router' {
       path: '/fashion'
       fullPath: '/fashion'
       preLoaderRoute: typeof FashionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -382,15 +462,19 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CatalogueRoute: CatalogueRoute,
   CheckoutRoute: CheckoutRoute,
+  ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
   FashionRoute: FashionRoute,
   FavouriteRoute: FavouriteRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LifestyleRoute: LifestyleRoute,
   LoginRoute: LoginRoute,
   OrdersRoute: OrdersRoute,
+  PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  TermsRoute: TermsRoute,
   OrderIdRoute: OrderIdRoute,
   ProductIdRoute: ProductIdRoute,
 }

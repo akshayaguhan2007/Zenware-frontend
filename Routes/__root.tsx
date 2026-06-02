@@ -1,11 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, Link, Outlet, useRouter } from "@tanstack/react-router";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import { Navbar } from "@/Components/Navbar";
+import { Footer } from "@/Components/Footer";
 import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
 import { WishlistProvider } from "@/lib/wishlist";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/Components/ui/sonner";
 
 const queryClient = new QueryClient();
 

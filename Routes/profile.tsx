@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useCart } from "@/lib/cart";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -37,15 +36,7 @@ type Profile = {
   vibe: string;
 };
 
-const PKEY = "fashion-profile";
-
-const defaultProfile: Profile = {
-  name: "Style Curator",
-  handle: "style.muse",
-  bio: "Slow fashion · vintage hearts · coffee in one hand, cashmere in the other.",
-  city: "Lisbon, PT",
-  vibe: "Quiet Luxury",
-};
+const PKEY = (userId: string) => `fashion-profile-${userId}`;
 
 const orders = [
   { id: "FSH-2041", date: "May 18, 2026", total: 248, status: "Delivered", items: 2 },
@@ -70,8 +61,18 @@ function ProfilePage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("overview");
   const [editing, setEditing] = useState(false);
-  const [profile, setProfile] = useState<Profile>(defaultProfile);
-  const [draft, setDraft] = useState<Profile>(defaultProfile);
+
+  // build default profile from signup data
+  const defaultFromAuth: Profile = useMemo(() => ({
+    name: user?.name || "Style Curator",
+    handle: user?.email?.split("@")[0] ?? "style.muse",
+    bio: "Slow fashion · vintage hearts · coffee in one hand, cashmere in the other.",
+    city: "India",
+    vibe: "Quiet Luxury",
+  }), [user]);
+
+  const [profile, setProfile] = useState<Profile>(defaultFromAuth);
+  const [draft, setDraft] = useState<Profile>(defaultFromAuth);
   const [pw, setPw] = useState("");
   const [pwMsg, setPwMsg] = useState<string | null>(null);
 
@@ -80,15 +81,20 @@ function ProfilePage() {
   }, [loading, user, navigate]);
 
   useEffect(() => {
+    if (!user) return;
     try {
-      const raw = localStorage.getItem(PKEY);
+      const raw = localStorage.getItem(PKEY(user.id));
       if (raw) {
         const p = JSON.parse(raw) as Profile;
         setProfile(p);
         setDraft(p);
+      } else {
+        // first visit — use signup data
+        setProfile(defaultFromAuth);
+        setDraft(defaultFromAuth);
       }
     } catch {}
-  }, []);
+  }, [user]);
 
   const initials = useMemo(
     () =>
@@ -110,8 +116,9 @@ function ProfilePage() {
   }, [user]);
 
   const save = () => {
+    if (!user) return;
     setProfile(draft);
-    localStorage.setItem(PKEY, JSON.stringify(draft));
+    localStorage.setItem(PKEY(user.id), JSON.stringify(draft));
     setEditing(false);
   };
 
@@ -464,4 +471,4 @@ function ProfilePage() {
   );
 }
 
-void supabase;
+

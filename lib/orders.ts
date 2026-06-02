@@ -1,5 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
-
 export type OrderStatus =
   | "pending"
   | "confirmed"
@@ -23,6 +21,12 @@ export const STATUS_LABEL: Record<string, string> = {
   out_for_delivery: "Out for Delivery",
   delivered: "Delivered",
   cancelled: "Cancelled",
+};
+
+export type TrackingEvent = {
+  status: OrderStatus;
+  note: string;
+  timestamp: string;
 };
 
 export type OrderItem = {
@@ -51,6 +55,7 @@ export type Order = {
   total: number;
   status: string;
   tracking_note?: string;
+  tracking_history?: TrackingEvent[];
   created_at: string;
   order_items?: OrderItem[];
 };
@@ -59,20 +64,43 @@ type CreateOrderInput = Omit<Order, "id" | "status" | "tracking_note" | "created
   items: Omit<OrderItem, "id">[];
 };
 
+const ORDERS_KEY = "fashion_orders";
+
+export function loadOrders(): Order[] {
+  try { return JSON.parse(localStorage.getItem(ORDERS_KEY) ?? "[]"); } catch { return []; }
+}
+
+export function saveOrders(orders: Order[]) {
+  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+}
+
 export async function createOrder(input: CreateOrderInput): Promise<Order> {
   const { items, ...orderData } = input;
+  const now = new Date().toISOString();
+  const order: Order = {
+    ...orderData,
+    id: crypto.randomUUID(),
+    status: "pending",
+    created_at: now,
+    tracking_history: [{ status: "pending", note: "Order placed successfully.", timestamp: now }],
+    order_items: items.map((it) => ({ ...it, id: crypto.randomUUID() })),
+  };
+  saveOrders([order, ...loadOrders()]);
+  return order;
+}
 
-  const { data: order, error } = await supabase
-    .from("orders")
-    .insert({ ...orderData, status: "pending" })
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-
-  const orderItems = items.map((it) => ({ ...it, order_id: order.id }));
-  const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
-  if (itemsError) throw new Error(itemsError.message);
-
-  return order as Order;
+export function updateOrderStatus(id: string, status: OrderStatus, tracking_note?: string) {
+  const note = tracking_note?.trim() || STATUS_LABEL[status];
+  const event: TrackingEvent = { status, note, timestamp: new Date().toISOString() };
+  const orders = loadOrders().map((o) =>
+    o.id === id
+      ? {
+          ...o,
+          status,
+          tracking_note: note,
+          tracking_history: [...(o.tracking_history ?? []), event],
+        }
+      : o
+  );
+  saveOrders(orders);
 }
