@@ -5,7 +5,7 @@ import {
   Loader2, CheckCircle2, Circle, Package,
   Truck, Home, ChevronLeft, Clock, XCircle,
 } from "lucide-react";
-import { loadOrders, STATUS_FLOW, STATUS_LABEL, type Order, type OrderStatus } from "@/lib/orders";
+import { getOrder, STATUS_FLOW, STATUS_LABEL, type Order, type OrderStatus } from "@/lib/orders";
 
 export const Route = createFileRoute("/order/$id")({
   head: () => ({ meta: [{ title: "Order — FASHION" }] }),
@@ -35,7 +35,7 @@ function OrderPage() {
   // poll every 5 seconds so admin updates reflect immediately
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", id],
-    queryFn: async () => loadOrders().find((o) => o.id === id) ?? null,
+    queryFn: () => getOrder(id),
     refetchInterval: 5000,
   });
 

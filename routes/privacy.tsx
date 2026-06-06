@@ -98,17 +98,17 @@ export default function PrivacyPage() {
         </div>
       </section>
 
-      {/* SECTIONS — alternating layout */}
-      <section className="px-6 lg:px-16 py-10">
-        <div className="mx-auto max-w-7xl">
+      {/* SECTIONS */}
+      <section className="px-6 lg:px-16 py-24">
+        <div className="mx-auto max-w-7xl space-y-20">
           {sections.map((s, i) => (
             <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
+              key={s.tag}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className={`grid md:grid-cols-[200px_1fr] gap-8 py-14 border-b border-wine-dark/10 ${i % 2 === 1 ? "md:grid-cols-[1fr_200px]" : ""}`}
+              transition={{ delay: i * 0.05 }}
+              className="grid md:grid-cols-2 gap-10 border-b border-wine-dark/10 pb-20"
             >
               {i % 2 === 1 ? (
                 <>

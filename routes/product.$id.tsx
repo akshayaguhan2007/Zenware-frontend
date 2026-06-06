@@ -3,16 +3,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
   ShoppingBag, Heart, Truck, RotateCcw, Shield,
-  ChevronLeft, Minus, Plus, Loader2, Star, Pencil, Trash2, Check,
+  ChevronLeft, Minus, Plus, Loader2, Star, Pencil, Trash2, Check, Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useProduct, useProducts } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
 import { useAuth } from "@/lib/auth";
+import { setBuyNow } from "@/lib/buynow";
 import {
-  getProductReviews, addReview, getUserReview,
-  deleteReview, getAverageRating, type Review,
+  getProductReviews, addReview,
+  deleteReview, type Review,
 } from "@/lib/reviews";
 
 export const Route = createFileRoute("/product/$id")({
@@ -93,10 +94,11 @@ function ProductPage() {
   const [form, setForm] = useState({ rating: 0, title: "", body: "" });
   const [submitting, setSubmitting] = useState(false);
 
-  const refreshReviews = () => {
-    setReviews(getProductReviews(id));
-    setAvgData(getAverageRating(id));
-    if (user) setMyReview(getUserReview(id, user.id));
+  const refreshReviews = async () => {
+    const data = await getProductReviews(id);
+    setReviews(data.reviews);
+    setAvgData({ avg: data.avg, count: data.count });
+    if (user) setMyReview(data.reviews.find((r) => r.user_id === user.id) ?? null);
   };
 
   useEffect(() => { refreshReviews(); }, [id, user]);
@@ -118,29 +120,27 @@ function ProductPage() {
     pct: reviews.length ? (reviews.filter((r) => r.rating === star).length / reviews.length) * 100 : 0,
   }));
 
-  const submitReview = (e: React.FormEvent) => {
+  const submitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) { toast.error("Sign in to leave a review"); return; }
     if (form.rating === 0) { toast.error("Please select a rating"); return; }
     setSubmitting(true);
-    addReview({
-      product_id: id,
-      user_id: user.id,
-      user_name: user.name || user.email,
-      rating: form.rating,
-      title: form.title,
-      body: form.body,
-    });
-    setForm({ rating: 0, title: "", body: "" });
-    setShowForm(false);
-    refreshReviews();
-    toast.success("Review submitted!");
-    setSubmitting(false);
+    try {
+      await addReview(id, { rating: form.rating, title: form.title, body: form.body });
+      setForm({ rating: 0, title: "", body: "" });
+      setShowForm(false);
+      await refreshReviews();
+      toast.success("Review submitted!");
+    } catch (e: any) {
+      toast.error(e.message ?? "Failed to submit review");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDelete = (reviewId: string) => {
-    deleteReview(reviewId);
-    refreshReviews();
+  const handleDelete = async (reviewId: string) => {
+    await deleteReview(reviewId);
+    await refreshReviews();
     toast.success("Review removed");
   };
 
@@ -198,13 +198,26 @@ function ProductPage() {
           </div>
 
           {/* actions */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <button onClick={() => { add(p, currentSize, qty); toast.success(`${p.name} added to bag`); navigate({ to: "/cart" }); }} className="flex-1 bg-wine-dark text-cream py-4 text-display tracking-wider hover:bg-wine transition-colors flex items-center justify-center gap-2">
-              <ShoppingBag size={18} /> ADD TO BAG
+          <div className="mt-8 flex flex-col gap-3">
+            {/* BUY NOW */}
+            <button
+              onClick={() => {
+                if (!user) { toast.error("Sign in to place an order"); navigate({ to: "/login" }); return; }
+                setBuyNow({ id: p.id, name: p.name, img: p.img, price: p.price, size: currentSize, qty });
+                navigate({ to: "/checkout" });
+              }}
+              className="w-full bg-wine text-cream py-4 text-display tracking-wider hover:bg-wine-dark transition-colors flex items-center justify-center gap-2"
+            >
+              <Zap size={18} /> BUY NOW
             </button>
-            <button onClick={() => { wish.toggle(p.id); toast.success(wish.has(p.id) ? "Removed from favourites" : "Saved to favourites"); }} className={`w-14 h-14 grid place-items-center border transition-colors ${wish.has(p.id) ? "bg-wine-dark text-cream border-wine-dark" : "border-wine-dark/30 text-wine-dark hover:bg-sand"}`} aria-label="Save">
-              <Heart size={18} fill={wish.has(p.id) ? "currentColor" : "none"} />
-            </button>
+            <div className="flex gap-3">
+              <button onClick={() => { add(p, currentSize, qty); toast.success(`${p.name} added to bag`); }} className="flex-1 border-2 border-wine-dark text-wine-dark py-4 text-display tracking-wider hover:bg-wine-dark hover:text-cream transition-colors flex items-center justify-center gap-2">
+                <ShoppingBag size={18} /> ADD TO BAG
+              </button>
+              <button onClick={() => { wish.toggle(p.id); toast.success(wish.has(p.id) ? "Removed from favourites" : "Saved to favourites"); }} className={`w-14 h-14 grid place-items-center border-2 transition-colors ${wish.has(p.id) ? "bg-wine-dark text-cream border-wine-dark" : "border-wine-dark/30 text-wine-dark hover:bg-sand"}`} aria-label="Save">
+                <Heart size={18} fill={wish.has(p.id) ? "currentColor" : "none"} />
+              </button>
+            </div>
           </div>
 
           {/* trust */}

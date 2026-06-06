@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMemo, useState, useRef, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ShoppingBag, Heart, Loader2, Search, ScanLine, X, Upload, ImageOff, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useProducts, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
-import { getAverageRating } from "@/lib/reviews";
+import { getProductReviews } from "@/lib/reviews";
 
 export const Route = createFileRoute("/catalogue")({
   head: () => ({
@@ -20,12 +21,16 @@ export const Route = createFileRoute("/catalogue")({
 
 /* ── small rating for catalogue card ── */
 function ProductRating({ productId }: { productId: string }) {
-  const { avg, count } = getAverageRating(productId);
-  if (count === 0) return <span className="text-xs text-wine-dark/30">No reviews</span>;
+  const { data } = useQuery({
+    queryKey: ["reviews", productId],
+    queryFn: () => getProductReviews(productId),
+    staleTime: 60_000,
+  });
+  if (!data || data.count === 0) return <span className="text-xs text-wine-dark/30">No reviews</span>;
   return (
     <span className="flex items-center gap-1">
       <Star size={11} fill="#6D2932" stroke="#6D2932" />
-      <span className="text-xs text-wine-dark/60">{avg} ({count})</span>
+      <span className="text-xs text-wine-dark/60">{data.avg} ({data.count})</span>
     </span>
   );
 }

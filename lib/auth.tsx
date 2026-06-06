@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { api, setToken, clearToken } from "./api";
 
 export type User = {
   id: string;
@@ -19,76 +20,62 @@ type AuthCtx = {
 
 const Ctx = createContext<AuthCtx>(null!);
 
-const USERS_KEY = "fashion_users";
-const SESSION_KEY = "fashion_session";
-
-type StoredUser = { id: string; email: string; name: string; password: string; created_at: string };
-
-function getUsers(): StoredUser[] {
-  try { return JSON.parse(localStorage.getItem(USERS_KEY) ?? "[]"); } catch { return []; }
-}
-
-function saveUsers(users: StoredUser[]) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-function getSession(): User | null {
-  try { return JSON.parse(localStorage.getItem(SESSION_KEY) ?? "null"); } catch { return null; }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setUser(getSession());
-    setLoading(false);
+    const token = localStorage.getItem("zenwear_token");
+    if (!token) { setLoading(false); return; }
+    api.get<User>("/auth/me")
+      .then(setUser)
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const users = getUsers();
-    const found = users.find((u) => u.email === email && u.password === password);
-    if (!found) return { error: "Invalid email or password." };
-    const u: User = { id: found.id, email: found.email, name: found.name ?? "", created_at: found.created_at };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(u));
-    setUser(u);
-    return { error: null };
+    try {
+      const { token, user: u } = await api.post<{ token: string; user: User }>("/auth/signin", { email, password });
+      setToken(token);
+      setUser(u);
+      return { error: null };
+    } catch (e: any) {
+      return { error: e.message };
+    }
   };
 
   const signUp = async (email: string, password: string, name: string) => {
-    const users = getUsers();
-    if (users.find((u) => u.email === email)) return { error: "An account with this email already exists." };
-    const newUser: StoredUser = {
-      id: crypto.randomUUID(),
-      email,
-      name,
-      password,
-      created_at: new Date().toISOString(),
-    };
-    saveUsers([...users, newUser]);
-    const u: User = { id: newUser.id, email: newUser.email, name: newUser.name, created_at: newUser.created_at };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(u));
-    setUser(u);
-    return { error: null };
+    try {
+      const { token, user: u } = await api.post<{ token: string; user: User }>("/auth/signup", { email, password, name });
+      setToken(token);
+      setUser(u);
+      return { error: null };
+    } catch (e: any) {
+      return { error: e.message };
+    }
   };
 
   const signOut = async () => {
-    localStorage.removeItem(SESSION_KEY);
+    clearToken();
     setUser(null);
   };
 
   const resetPassword = async (email: string) => {
-    const users = getUsers();
-    if (!users.find((u) => u.email === email)) return { error: "No account found with this email." };
-    return { error: null };
+    try {
+      await api.post("/auth/reset-password", { email });
+      return { error: null };
+    } catch (e: any) {
+      return { error: e.message };
+    }
   };
 
   const updatePassword = async (password: string) => {
-    if (!user) return { error: "Not signed in." };
-    const users = getUsers();
-    const updated = users.map((u) => u.id === user.id ? { ...u, password } : u);
-    saveUsers(updated);
-    return { error: null };
+    try {
+      await api.post("/auth/update-password", { password });
+      return { error: null };
+    } catch (e: any) {
+      return { error: e.message };
+    }
   };
 
   return (

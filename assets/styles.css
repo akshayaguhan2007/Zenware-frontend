@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss" source(none);
-@source "./";
+@source "../";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));

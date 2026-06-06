@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   User as UserIcon,
   Heart,
@@ -62,17 +62,8 @@ function ProfilePage() {
   const [tab, setTab] = useState<Tab>("overview");
   const [editing, setEditing] = useState(false);
 
-  // build default profile from signup data
-  const defaultFromAuth: Profile = useMemo(() => ({
-    name: user?.name || "Style Curator",
-    handle: user?.email?.split("@")[0] ?? "style.muse",
-    bio: "Slow fashion · vintage hearts · coffee in one hand, cashmere in the other.",
-    city: "India",
-    vibe: "Quiet Luxury",
-  }), [user]);
-
-  const [profile, setProfile] = useState<Profile>(defaultFromAuth);
-  const [draft, setDraft] = useState<Profile>(defaultFromAuth);
+  const [profile, setProfile] = useState<Profile>({ name: "", handle: "", bio: "", city: "", vibe: "" });
+  const [draft, setDraft] = useState<Profile>({ name: "", handle: "", bio: "", city: "", vibe: "" });
   const [pw, setPw] = useState("");
   const [pwMsg, setPwMsg] = useState<string | null>(null);
 
@@ -82,6 +73,13 @@ function ProfilePage() {
 
   useEffect(() => {
     if (!user) return;
+    const fromAuth: Profile = {
+      name: user.name || "Style Curator",
+      handle: user.email.split("@")[0],
+      bio: "Slow fashion · vintage hearts · coffee in one hand, cashmere in the other.",
+      city: "India",
+      vibe: "Quiet Luxury",
+    };
     try {
       const raw = localStorage.getItem(PKEY(user.id));
       if (raw) {
@@ -89,12 +87,14 @@ function ProfilePage() {
         setProfile(p);
         setDraft(p);
       } else {
-        // first visit — use signup data
-        setProfile(defaultFromAuth);
-        setDraft(defaultFromAuth);
+        setProfile(fromAuth);
+        setDraft(fromAuth);
       }
-    } catch {}
-  }, [user]);
+    } catch {
+      setProfile(fromAuth);
+      setDraft(fromAuth);
+    }
+  }, [user?.id]);
 
   const initials = useMemo(
     () =>

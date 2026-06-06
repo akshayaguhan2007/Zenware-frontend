@@ -6,7 +6,7 @@ import { Loader2, Plus, Pencil, Trash2, Save, X, Package, ShoppingBag, Users, Tr
 import { useAuth } from "@/lib/auth";
 import { useIsAdmin } from "@/lib/admin";
 import { useProducts, useProductsMutations, type Product } from "@/lib/products";
-import { loadOrders, saveOrders, updateOrderStatus, STATUS_FLOW, STATUS_LABEL, type Order, type OrderStatus } from "@/lib/orders";
+import { getAllOrders, updateOrderStatus, STATUS_FLOW, STATUS_LABEL, type Order, type OrderStatus } from "@/lib/orders";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — FASHION" }] }),
@@ -80,7 +80,7 @@ function AdminPage() {
 }
 
 function Overview() {
-  const { data: orders = [] } = useQuery({ queryKey: ["admin-orders"], queryFn: async () => loadOrders() });
+  const { data: orders = [] } = useQuery({ queryKey: ["admin-orders"], queryFn: () => getAllOrders() });
   const { data: products = [] } = useProducts(true);
   const revenue = orders.filter(o => o.status !== "cancelled").reduce((a, o) => a + Number(o.total), 0);
   const stats = [
@@ -208,13 +208,13 @@ function OrdersTab() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["admin-orders-full"],
-    queryFn: async () => loadOrders(),
+    queryFn: () => getAllOrders(),
   });
 
   const filtered = statusFilter === "all" ? orders : orders.filter(o => o.status === statusFilter);
 
   const updateStatus = async (id: string, status: OrderStatus, note?: string) => {
-    updateOrderStatus(id, status, note);
+    await updateOrderStatus(id, status, note);
     qc.invalidateQueries({ queryKey: ["admin-orders-full"] });
   };
 
@@ -297,7 +297,7 @@ function AdminOrderCard({ order, onUpdate }: { order: Order; onUpdate: (id: stri
 }
 
 function CustomersTab() {
-  const { data: orders = [], isLoading } = useQuery({ queryKey: ["admin-orders-customers"], queryFn: async () => loadOrders() });
+  const { data: orders = [], isLoading } = useQuery({ queryKey: ["admin-orders-customers"], queryFn: () => getAllOrders() });
   const customers = Array.from(
     orders.reduce((m, o) => {
       const c = m.get(o.user_id) ?? { user_id: o.user_id, email: o.user_email, name: o.full_name, phone: o.phone, orders: 0, total: 0, last: o.created_at };

@@ -2,9 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Loader2, Lock, LocateFixed, CheckCircle2, AlertCircle, MapPin, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { createOrder } from "@/lib/orders";
+import { getBuyNow, clearBuyNow } from "@/lib/buynow";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout — ZenWear" }] }),
@@ -152,8 +154,6 @@ function Checkout() {
     setSubmitting(true);
     try {
       const order = await createOrder({
-        user_id: user.id,
-        user_email: user.email,
         full_name: form.full_name,
         phone: form.phone,
         address_line: form.address_line,

@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { api } from "./api";
+import { useAuth } from "./auth";
 
 type WishlistCtx = {
   ids: string[];
@@ -12,14 +14,27 @@ type WishlistCtx = {
 const Ctx = createContext<WishlistCtx>(null!);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [ids, setIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!user) { setIds([]); return; }
+    api.get<string[]>("/wishlist")
+      .then(setIds)
+      .catch(() => setIds([]));
+  }, [user]);
 
   const has = (id: string) => ids.includes(id);
 
-  const toggle = (id: string) =>
-    setIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  const toggle = (id: string) => {
+    setIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+    api.post(`/wishlist/${id}`, {}).catch(() => {});
+  };
 
-  const remove = (id: string) => setIds((prev) => prev.filter((x) => x !== id));
+  const remove = (id: string) => {
+    setIds((prev) => prev.filter((x) => x !== id));
+    api.delete(`/wishlist/${id}`).catch(() => {});
+  };
 
   const clear = () => setIds([]);
 
