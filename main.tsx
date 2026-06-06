@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
-import { getRouter } from "./Routes/router";
+import { getRouter } from "./routes/router";
 import "./assets/styles.css";
 
 const router = getRouter();

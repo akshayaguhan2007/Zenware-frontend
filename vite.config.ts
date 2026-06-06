@@ -8,8 +8,8 @@ export default defineConfig({
   root: path.resolve(__dirname),
   plugins: [
     TanStackRouterVite({
-      routesDirectory: "./Routes",
-      generatedRouteTree: "./Routes/routeTree.gen.ts",
+      routesDirectory: "./routes",
+      generatedRouteTree: "./routes/routeTree.gen.ts",
       routeFileIgnorePattern: "(router|routeTree.gen)\\.(tsx?|js)$",
     }),
     react(),
