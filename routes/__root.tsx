@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createRootRoute, Link, Outlet, useRouter } from "@tanstack/react-router";
+import { createRootRoute, Link, Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CartProvider } from "@/lib/cart";
@@ -10,6 +10,9 @@ import { Toaster } from "@/components/ui/sonner";
 const queryClient = new QueryClient();
 
 function RootComponent() {
+  const { location } = useRouterState();
+  const hideFooter = location.pathname === "/login" || location.pathname === "/signup";
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -20,7 +23,7 @@ function RootComponent() {
               <main className="flex-1">
                 <Outlet />
               </main>
-              <Footer />
+              {!hideFooter && <Footer />}
             </div>
             <Toaster />
           </CartProvider>

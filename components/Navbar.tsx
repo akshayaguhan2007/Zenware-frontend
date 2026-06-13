@@ -20,11 +20,11 @@ export function Navbar() {
   const { location } = useRouterState();
 
   return (
-    <header className="sticky top-0 z-50 bg-cream/95 backdrop-blur border-b border-wine-dark/10">
+    <header className="sticky top-0 z-50 bg-wine-dark/95 backdrop-blur border-b border-cream/10 text-cream">
       <div className="mx-auto max-w-7xl px-6 lg:px-10 h-16 flex items-center justify-between">
 
         {/* LOGO */}
-        <Link to="/" className="text-display text-xl text-wine-dark tracking-wider">
+        <Link to="/" className="text-display text-xl text-cream tracking-wider">
           ZenWear
         </Link>
 
@@ -34,8 +34,8 @@ export function Navbar() {
             <Link
               key={l.to}
               to={l.to}
-              className={`text-sm tracking-wider transition-colors hover:text-wine-dark ${
-                location.pathname === l.to ? "text-wine-dark" : "text-wine-dark/60"
+              className={`text-sm tracking-wider transition-colors hover:text-highlight ${
+                location.pathname === l.to ? "text-cream" : "text-cream/70"
               }`}
             >
               {l.label}
@@ -70,7 +70,7 @@ export function Navbar() {
 
           {/* Mobile menu toggle */}
           <button
-            className="md:hidden relative w-10 h-10 grid place-items-center text-wine-dark hover:text-wine transition-colors ml-1"
+            className="md:hidden relative w-10 h-10 grid place-items-center text-cream hover:text-highlight transition-colors ml-1"
             onClick={() => setOpen(!open)}
             aria-label="Menu"
           >
@@ -81,30 +81,30 @@ export function Navbar() {
 
       {/* MOBILE MENU */}
       {open && (
-        <div className="md:hidden bg-cream border-t border-wine-dark/10 px-6 py-4 flex flex-col gap-4">
+        <div className="md:hidden bg-wine-dark border-t border-cream/10 px-6 py-4 flex flex-col gap-4">
           {navLinks.map((l) => (
             <Link
               key={l.to}
               to={l.to}
               onClick={() => setOpen(false)}
               className={`text-display text-lg transition-colors ${
-                location.pathname === l.to ? "text-wine-dark" : "text-wine-dark/60"
+                location.pathname === l.to ? "text-cream" : "text-cream/70"
               }`}
             >
               {l.label}
             </Link>
           ))}
           <div className="border-t border-wine-dark/10 pt-4 flex flex-col gap-3">
-            <Link to="/orders" onClick={() => setOpen(false)} className="flex items-center gap-3 text-wine-dark/70">
+            <Link to="/orders" onClick={() => setOpen(false)} className="flex items-center gap-3 text-cream/80 hover:text-highlight">
               <Package size={18} /> My Orders
             </Link>
-            <Link to="/favourite" onClick={() => setOpen(false)} className="flex items-center gap-3 text-wine-dark/70">
+            <Link to="/favourite" onClick={() => setOpen(false)} className="flex items-center gap-3 text-cream/80 hover:text-highlight">
               <Heart size={18} /> Favourites {wishCount > 0 && `(${wishCount})`}
             </Link>
-            <Link to="/cart" onClick={() => setOpen(false)} className="flex items-center gap-3 text-wine-dark/70">
+            <Link to="/cart" onClick={() => setOpen(false)} className="flex items-center gap-3 text-cream/80 hover:text-highlight">
               <ShoppingBag size={18} /> Bag {count > 0 && `(${count})`}
             </Link>
-            <Link to={user ? "/profile" : "/login"} onClick={() => setOpen(false)} className="flex items-center gap-3 text-wine-dark/70">
+            <Link to={user ? "/profile" : "/login"} onClick={() => setOpen(false)} className="flex items-center gap-3 text-cream/80 hover:text-highlight">
               <User size={18} /> {user ? "Profile" : "Sign In"}
             </Link>
           </div>
@@ -124,14 +124,14 @@ function NavIcon({
     <Link
       to={to}
       className={`group relative w-10 h-10 grid place-items-center transition-colors ${
-        active ? "text-wine-dark" : "text-wine-dark/60 hover:text-wine-dark"
+        active ? "text-cream" : "text-cream/70 hover:text-highlight"
       }`}
       aria-label={label}
     >
       {children}
       {/* active dot */}
       {active && (
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-wine-dark" />
+        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-highlight" />
       )}
       {/* tooltip */}
       <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-wine-dark text-cream text-[10px] tracking-wider px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
